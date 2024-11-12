@@ -56,7 +56,107 @@ async function fetchSavedCharts() {
     });
 }
 
-document.addEventListener('keydown', (e) => {
+// GitHub song fetching functionality
+const repoUrlInput = document.getElementById('repo-url');
+const fetchButton = document.getElementById('fetch-songs');
+const loadingIndicator = document.querySelector('.loading-indicator');
+const songList = document.querySelector('.song-list');
+
+fetchButton.addEventListener('click', fetchSongsFromRepo);
+
+async function fetchSongsFromRepo() {
+    const repoUrl = repoUrlInput.value;
+    if (!repoUrl) return;
+
+    // Show loading indicator
+    loadingIndicator.classList.remove('hidden');
+    songList.innerHTML = '';
+
+    try {
+        // Convert GitHub URL to raw content URL for manifest.json
+        const rawRepoUrl = convertToRawUrl(repoUrl);
+        const manifestUrl = `${rawRepoUrl}/refs/heads/main/manifest.json`;
+
+        // Fetch manifest
+        const response = await fetch(manifestUrl);
+        const manifest = await response.json();
+
+        // Display songs
+        manifest.songs.forEach(song => {
+            const songElement = createSongElement(song);
+            songList.appendChild(songElement);
+        });
+
+    } catch (error) {
+        songList.innerHTML = '<div class="error">Failed to fetch songs. Check the repository URL.</div>';
+    } finally {
+        loadingIndicator.classList.add('hidden');
+    }
+}
+
+function convertToRawUrl(githubUrl) {
+    return githubUrl
+        .replace('github.com', 'raw.githubusercontent.com')
+        .replace(/\/$/, '');
+}
+
+function createSongElement(song) {
+    const div = document.createElement('div');
+    div.className = 'song-item';
+    div.innerHTML = `
+        <h3>${song.title}</h3>
+        <p>Artist: ${song.artist}</p>
+        <p>BPM: ${song.bpm}</p>
+        <div class="difficulty-list">
+            ${song.difficulties.map(diff => 
+                `<span class="difficulty-badge ${diff.name.toLowerCase()}">
+                    ${diff.name} (Lv.${diff.level})
+                </span>`
+            ).join('')}
+        </div>
+    `;
+
+    div.addEventListener('click', () => loadSong(song));
+    return div;
+}
+
+async function loadSong(song) {
+    const repoUrl = convertToRawUrl(repoUrlInput.value);
+    
+    // Fetch audio file
+    const audioUrl = `${repoUrl}/refs/heads/main/${song.audioFile}`;
+    const audio = new Audio(audioUrl);
+    
+    // Fetch chart file for selected difficulty
+    const selectedDifficulty = song.difficulties[1]; // Default to Normal difficulty
+    const chartUrl = `${repoUrl}/refs/heads/main/${song.chartFile}`;
+    
+    try {
+        const chartResponse = await fetch(chartUrl);
+        const chartData = await chartResponse.json();
+        
+        // Hide song select screen
+        document.getElementById('song-select').classList.add('hidden');
+        
+        // Show game container
+        const gameContainer = document.getElementById('game-container');
+        gameContainer.classList.remove('hidden');
+        
+        // Initialize game with audio and chart data
+        initializeGame(audio, chartData);
+        
+    } catch (error) {
+        console.log('Chart loading failed:', error);
+    }
+}
+
+function initializeGame(audio, chartData) {
+    startGame(chartData);
+    console.log('Game starting with:', {
+        audio: audio,
+        chart: chartData
+    });
+}document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         if (currentScreen === 'menu') return;
         showScreen('menu');
