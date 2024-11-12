@@ -16,6 +16,13 @@
     </div>
 
     <div id="song-select" class="hidden">
+        <div class="repo-controls">
+            <input type="text" id="repo-url" placeholder="Enter GitHub repository URL">
+            <button id="fetch-songs">Fetch Songs</button>
+        </div>
+        <div class="loading-indicator hidden">
+            <span>Fetching songs...</span>
+        </div>
         <div class="song-list"></div>
     </div>
 
