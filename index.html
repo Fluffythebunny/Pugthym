@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pugthym</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="menu-options">
+        <h1 class="game-title">Pugthym</h1>
+        <button class="menu-button">Play</button>
+        <button class="menu-button">Editor</button>
+        <button class="menu-button">Settings</button>
+    </div>
+
+    <div id="song-select" class="hidden">
+        <div class="song-list"></div>
+    </div>
+
+    <div id="chart-editor" class="hidden">
+        <div class="editor-controls">
+            <input type="file" id="audio-upload" accept="audio/*">
+            <button id="play-pause">Play/Pause</button>
+            <input type="number" id="bpm" value="120" min="1">
+            <input type="number" id="snap" value="4" min="1">
+            <button id="save-chart">Save Chart</button>
+            <input type="file" id="load-chart" accept=".json">
+            <span id="current-time">Time: 0:00</span>
+            <span id="note-count">Notes: 0</span>
+        </div>
+        <canvas id="timeline"></canvas>
+    </div>
+
+    <div id="settings" class="hidden">
+        <div class="settings-container">
+            <div class="setting-group">
+                <label>Scroll Speed</label>
+                <input type="range" min="1" max="10" value="5">
+            </div>
+            <div class="setting-group">
+                <label>Timing Window</label>
+                <select>
+                    <option>Strict</option>
+                    <option selected>Normal</option>
+                    <option>Lenient</option>
+                </select>
+                <label>Bot Play</label>
+                <select id="bot-play">
+                    <option value="off" selected>Off</option>
+                    <option value="on">On</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-container" class="hidden"></div>
+    <script src="script.js"></script>
+</body>
+</html>
