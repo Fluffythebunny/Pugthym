@@ -56,7 +56,6 @@ async function fetchSavedCharts() {
     });
 }
 
-// GitHub song fetching functionality
 const repoUrlInput = document.getElementById('repo-url');
 const fetchButton = document.getElementById('fetch-songs');
 const loadingIndicator = document.querySelector('.loading-indicator');
@@ -67,21 +66,13 @@ fetchButton.addEventListener('click', fetchSongsFromRepo);
 async function fetchSongsFromRepo() {
     const repoUrl = repoUrlInput.value;
     if (!repoUrl) return;
-
-    // Show loading indicator
     loadingIndicator.classList.remove('hidden');
     songList.innerHTML = '';
-
     try {
-        // Convert GitHub URL to raw content URL for manifest.json
         const rawRepoUrl = convertToRawUrl(repoUrl);
         const manifestUrl = `${rawRepoUrl}/refs/heads/main/manifest.json`;
-
-        // Fetch manifest
         const response = await fetch(manifestUrl);
         const manifest = await response.json();
-
-        // Display songs
         manifest.songs.forEach(song => {
             const songElement = createSongElement(song);
             songList.appendChild(songElement);
@@ -122,27 +113,17 @@ function createSongElement(song) {
 
 async function loadSong(song) {
     const repoUrl = convertToRawUrl(repoUrlInput.value);
-    
-    // Fetch audio file
     const audioUrl = `${repoUrl}/refs/heads/main/${song.audioFile}`;
     const audio = new Audio(audioUrl);
-    
-    // Fetch chart file for selected difficulty
-    const selectedDifficulty = song.difficulties[1]; // Default to Normal difficulty
+    const selectedDifficulty = song.difficulties[1];
     const chartUrl = `${repoUrl}/refs/heads/main/${song.chartFile}`;
     
     try {
         const chartResponse = await fetch(chartUrl);
         const chartData = await chartResponse.json();
-        
-        // Hide song select screen
         document.getElementById('song-select').classList.add('hidden');
-        
-        // Show game container
         const gameContainer = document.getElementById('game-container');
         gameContainer.classList.remove('hidden');
-        
-        // Initialize game with audio and chart data
         initializeGame(audio, chartData);
         
     } catch (error) {
@@ -406,32 +387,23 @@ class RhythmGame {
             const timeUntilHit = note.time - currentTime;
             const progress = (1 - timeUntilHit) * 100;
             element.style.top = `${progress}%`;
-            
-            // Enhanced bot play with wider hit window
             if (this.botPlay && timeUntilHit <= 0.05 && timeUntilHit >= -0.05) {
-                // Trigger perfect hit
                 this.score += 100 * (1 + this.combo * 0.1);
                 this.combo++;
                 element.remove();
                 this.noteElements.delete(note);
                 this.updateStats();
-                
-                // Visual feedback
                 const lanes = document.querySelectorAll('.lane');
                 const lane = lanes[note.lane];
                 const hitIndicator = lane.querySelector('.hit-indicator');
                 const keyOverlay = lane.querySelector('.key-overlay');
-                
                 hitIndicator.classList.add('hit-flash');
                 keyOverlay.classList.add('key-pressed');
-                
                 setTimeout(() => {
                     hitIndicator.classList.remove('hit-flash');
                     keyOverlay.classList.remove('key-pressed');
                 }, 100);
             }
-            
-            // Remove missed notes
             if (!this.botPlay && progress > 100) {
                 element.remove();
                 this.noteElements.delete(note);
@@ -683,5 +655,4 @@ class ChartEditor {
     }
 }
 
-// Initialize the menu
 updateMenuSelection();
