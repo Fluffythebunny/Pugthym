@@ -262,6 +262,8 @@ class RhythmGame {
         this.scrollSpeed = 600;
         this.noteElements = new Map();
         this.botPlay = document.querySelector('#bot-play').value === 'on';
+        this.totalNotesHit = 0;
+        this.totalNotes = songData.notes.length;
     }
 
     async init() {
@@ -276,6 +278,7 @@ class RhythmGame {
             <div class="game-stats">
                 <div id="game-score">Score: 0</div>
                 <div id="game-combo">Combo: 0</div>
+                <div id="game-accuracy">Accuracy: 0.00%</div>
             </div>
             <div class="game-lanes">
                 <div class="lane" data-key="D">
@@ -339,12 +342,18 @@ class RhythmGame {
         
         for (const [note, element] of this.noteElements) {
             if (note.lane === lane && Math.abs(note.time - currentTime) < hitWindow) {
-                this.score += 100 * (1 + this.combo * 0.1);
-                this.combo++;
-                element.remove();
-                this.noteElements.delete(note);
-                this.updateStats();
-                break;
+                const currentTime = this.audioContext.currentTime - this.startTime;
+                const hitWindow = 0.150;
+                const accuracy = Math.max(0, 1 - Math.abs(note.time - currentTime) / hitWindow);
+                if (accuracy > 0) {
+                    this.totalNotesHit++;
+                    this.score += 100 * accuracy * (1 + this.combo * 0.1);
+                    this.combo++;
+                    element.remove();
+                    this.noteElements.delete(note);
+                    this.updateStats();
+                    break;
+                }
             }
         }
     }
@@ -425,6 +434,7 @@ class RhythmGame {
     updateStats() {
         document.getElementById('game-score').textContent = `Score: ${Math.floor(this.score)}`;
         document.getElementById('game-combo').textContent = `Combo: ${this.combo}`;
+        document.getElementById('game-accuracy').textContent = `Accuracy: ${accuracy.toFixed(2)}%`;
     }
 }
 
