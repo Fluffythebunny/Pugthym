@@ -354,6 +354,7 @@ class RhythmGame {
                 <div id="game-score">Score: 0</div>
                 <div id="game-combo">Combo: 0</div>
                 <div id="game-accuracy">Accuracy: 0.00%</div>
+                <div id="game-misses">Misses: 0</div>
             </div>
             <div class="game-lanes">
                 <div class="lane" data-key="D">
@@ -528,6 +529,7 @@ class RhythmGame {
         document.getElementById('game-score').textContent = `Score: ${Math.floor(this.score)}`;
         document.getElementById('game-combo').textContent = `Combo: ${this.combo}`;
         document.getElementById('game-accuracy').textContent = `Accuracy: ${this.accuracy.toFixed(2)}%`;
+        document.getElementById('game-misses').textContent = `Misses: ${this.notesMissed}`;
     }
 }
 
