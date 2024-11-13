@@ -347,12 +347,12 @@ class RhythmGame {
             if (note.lane === lane) {
                 const currentTime = this.audioContext.currentTime - this.startTime;
                 const hitWindow = 0.150;
-                const accuracyDelta = 1 - Math.abs(note.time - currentTime) / hitWindow; // Calculate accuracy change
+                const accuracyDelta = 1 - Math.abs(note.time - currentTime) / hitWindow;
 
                 if (accuracyDelta > 0) {
                     this.score += 100 * accuracyDelta * (1 + this.combo * 0.1);
                     this.combo++;
-                    this.accuracy = Math.max(0, this.accuracy + accuracyDelta * (100 / this.totalNotes)); // Update accuracy
+                    this.accuracy = Math.max(0, this.accuracy + accuracyDelta * (100 / this.totalNotes));
                     const noteElement = this.noteElements.get(note);
                     if (noteElement) {
                         noteElement.remove();
@@ -361,16 +361,16 @@ class RhythmGame {
                     this.notes.splice(i, 1);
                     i--;
 
-                    hit = true; // Set hit flag to true
+                    hit = true;
                     this.updateStats();
                     break;
                 }
             }
         }
 
-        if (!hit && !this.botPlay) { // Only decrement accuracy if not a bot and no note was hit
+        if (!hit && !this.botPlay) {
             this.notesMissed++;
-            this.accuracy = Math.max(0, this.accuracy - (100 / this.totalNotes)); // Decrement accuracy for misses
+            this.accuracy = Math.max(0, this.accuracy - (100 / this.totalNotes));
             this.combo = 0;
             this.updateStats();
         }
