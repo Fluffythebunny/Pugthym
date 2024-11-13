@@ -5,6 +5,47 @@
     --secondary: #FF5555;
 }
 
+#credits {
+    position: absolute; /* Or fixed, if you prefer */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background);  /* Use the --background variable */
+    color: var(--text);  /* Use the --text variable */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif; /* Use the same font as body */
+    font-size: 20px; /* Adjust as needed */
+    text-align: center;
+    transition: font-size 0.1s ease, letter-spacing 0.1s ease;
+    z-index: 100; /* Ensure it's on top */
+    text-shadow: 
+        0 0 5px var(--primary),  /* Smaller, brighter inner glow */
+        0 0 15px var(--primary), /* Larger, softer outer glow */
+        0 0 25px rgba(255, 255, 255, 0.5); /* Very soft white glow */
+}
+
+#credits span:nth-child(odd) {
+    text-shadow: 
+        0 0 5px var(--primary),
+        0 0 15px var(--primary),
+        0 0 25px rgba(255, 255, 255, 0.5);
+}
+
+#credits span {
+    display: inline-block;
+    margin: 0.5em 0; /* Adjust spacing between lines */
+    transition: text-shadow 0.1s ease;
+}
+
+/* Optional: Style alternating lines for a visual effect */
+#credits span:nth-child(odd) {
+    color: var(--primary); /* Use your primary color */
+}
+
 body {
     margin: 0;
     padding: 0;
