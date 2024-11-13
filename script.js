@@ -164,7 +164,7 @@ const creditsDiv = document.getElementById('credits');
 const creditsButton = document.getElementById('credits-button');
 
 const audioElement = new Audio();
-audioElement.src = "https://ucarecdn.com/98f6e4a2-ab86-4895-a90a-a3179f37bc8d/InterstellarRetribution.mp3"; // Replace with your actual audio file
+audioElement.src = "https://ucarecdn.com/4a8bd16e-0bcd-4fc9-be5f-154075a6195e/creditssong.mp3";
 audioElement.crossOrigin = "anonymous";
 
 const source = audioCtx.createMediaElementSource(audioElement);
@@ -178,17 +178,16 @@ function visualize() {
 
     const averageFrequency = frequencyData.reduce((sum, val) => sum + val, 0) / frequencyData.length;
 
-    const minFontSize = 20;       // Minimum font size
-    const maxFontSize = 40;       // Maximum font size
+    const minFontSize = 20;       
+    const maxFontSize = 40;       
     const scalingFactor = 0.2;
-    const minBlur = 5;        // Minimum blur radius
-    const maxBlur = 25;       // Maximum blur radius
+    const minBlur = 5;        
+    const maxBlur = 25;       
     const blurScalingFactor = 0.5; 
-    const minSpread = 0;  // This was missing or in the wrong scope
+    const minSpread = 0; 
     const maxSpread = 15;
-    const spreadScalingFactor = 0.3;// Adjust to control blur sensitivity;   // Adjust this to control scaling sensitivity
+    const spreadScalingFactor = 0.3;
 
-    // Calculate the font size, clamping it between min and max
     let fontSize = minFontSize + (averageFrequency * scalingFactor);
     fontSize = Math.max(minFontSize, Math.min(fontSize, maxFontSize));
     let spreadRadius = minSpread + (averageFrequency * spreadScalingFactor);
@@ -200,9 +199,9 @@ function visualize() {
     creditsText.forEach(span => {
         span.style.fontSize = fontSize + 'px';
         span.style.letterSpacing = (averageFrequency / 50) + 'em';
-        span.style.fontSize = fontSize + 'px'; // Use the calculated fontSize
+        span.style.fontSize = fontSize + 'px';
         span.style.letterSpacing = (averageFrequency / 50) + 'em';
-        span.style.textShadow = `0 0 ${blurRadius}px ${spreadRadius}px var(--primary)`; // You can adjust this too
+        span.style.textShadow = `0 0 ${blurRadius}px ${spreadRadius}px var(--primary)`;
     });
 
     requestAnimationFrame(visualize);
@@ -287,8 +286,8 @@ function selectMenuOption() {
         case 2:
             showScreen('settings');
             break;
-        case 3: // Credits  <-- Add this case
-            showScreen('credits'); //  <-- Call showScreen with 'credits'
+        case 3:
+            showScreen('credits');
             break;
     }
 }
@@ -317,8 +316,7 @@ function showScreen(screenName) {
         }
     }
     else if (screenName === 'credits') {
-        // *** Resume the audio context before playing ***
-        audioCtx.resume().then(() => {  // Use .then() to ensure it's resumed
+        audioCtx.resume().then(() => {  
             audioElement.play();
             visualize();
         });
