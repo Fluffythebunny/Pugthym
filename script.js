@@ -264,6 +264,8 @@ class RhythmGame {
         this.botPlay = document.querySelector('#bot-play').value === 'on';
         this.totalNotesHit = 0;
         this.totalNotes = songData.notes.length;
+        this.accuracy = 100;
+        this.notesMissed = 0;
     }
 
     async init() {
@@ -328,7 +330,7 @@ class RhythmGame {
         const lanes = document.querySelectorAll('.lane');
         const hitIndicator = lanes[lane].querySelector('.hit-indicator');
         const keyOverlay = lanes[lane].querySelector('.key-overlay');
-        
+        let hit = false;
         hitIndicator.classList.add('hit-flash');
         keyOverlay.classList.add('key-pressed');
         
@@ -336,27 +338,43 @@ class RhythmGame {
             hitIndicator.classList.remove('hit-flash');
             keyOverlay.classList.remove('key-pressed');
         }, 100);
-
+    
         const currentTime = this.audioContext.currentTime - this.startTime;
         const hitWindow = 0.150;
-        
-        for (const [note, element] of this.noteElements) {
-            if (note.lane === lane && Math.abs(note.time - currentTime) < hitWindow) {
+    
+        for (let i = 0; i < this.notes.length; i++) {
+            const note = this.notes[i];
+            if (note.lane === lane) {
                 const currentTime = this.audioContext.currentTime - this.startTime;
                 const hitWindow = 0.150;
-                const accuracy = Math.max(0, 1 - Math.abs(note.time - currentTime) / hitWindow);
-                if (accuracy > 0) {
-                    this.totalNotesHit++;
-                    this.score += 100 * accuracy * (1 + this.combo * 0.1);
+                const accuracyDelta = 1 - Math.abs(note.time - currentTime) / hitWindow; // Calculate accuracy change
+
+                if (accuracyDelta > 0) {
+                    this.score += 100 * accuracyDelta * (1 + this.combo * 0.1);
                     this.combo++;
-                    element.remove();
-                    this.noteElements.delete(note);
+                    this.accuracy = Math.max(0, this.accuracy + accuracyDelta * (100 / this.totalNotes)); // Update accuracy
+                    const noteElement = this.noteElements.get(note);
+                    if (noteElement) {
+                        noteElement.remove();
+                        this.noteElements.delete(note);
+                    }
+                    this.notes.splice(i, 1);
+                    i--;
+
+                    hit = true; // Set hit flag to true
                     this.updateStats();
                     break;
                 }
             }
         }
-    }
+
+        if (!hit && !this.botPlay) { // Only decrement accuracy if not a bot and no note was hit
+            this.notesMissed++;
+            this.accuracy = Math.max(0, this.accuracy - (100 / this.totalNotes)); // Decrement accuracy for misses
+            this.combo = 0;
+            this.updateStats();
+        }
+    }    
 
     async loadAudio() {
         const fileInput = document.createElement('input');
@@ -434,7 +452,7 @@ class RhythmGame {
     updateStats() {
         document.getElementById('game-score').textContent = `Score: ${Math.floor(this.score)}`;
         document.getElementById('game-combo').textContent = `Combo: ${this.combo}`;
-        document.getElementById('game-accuracy').textContent = `Accuracy: ${accuracy.toFixed(2)}%`;
+        document.getElementById('game-accuracy').textContent = `Accuracy: ${this.accuracy.toFixed(2)}%`;
     }
 }
 
