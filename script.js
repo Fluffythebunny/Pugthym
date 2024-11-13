@@ -425,7 +425,7 @@ class RhythmGame {
                 if (accuracyDelta > 0) {
                     this.score += 100 * accuracyDelta * (1 + this.combo * 0.1);
                     this.combo++;
-                    this.accuracy = Math.max(0, this.accuracy + accuracyDelta * (100 / this.totalNotes));
+                    this.accuracy = Math.min(100, Math.max(0, this.accuracy + accuracyDelta * (100 / this.totalNotes)));
                     const noteElement = this.noteElements.get(note);
                     if (noteElement) {
                         noteElement.remove();
@@ -508,6 +508,8 @@ class RhythmGame {
                 element.remove();
                 this.noteElements.delete(note);
                 this.combo = 0;
+                this.accuracy = Math.max(0, this.accuracy - (100 / this.totalNotes));
+                this.notesMissed++;
                 this.updateStats();
             }
         });
