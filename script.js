@@ -7,7 +7,8 @@ const screens = {
     menu: document.querySelector('.menu-options'),
     songs: document.querySelector('#song-select'),
     editor: document.querySelector('#chart-editor'),
-    settings: document.querySelector('#settings')
+    settings: document.querySelector('#settings'),
+    credits: document.getElementById('credits')
 };
 
 const menuButtons = document.querySelectorAll('.menu-button');
@@ -137,7 +138,8 @@ function initializeGame(audio, chartData) {
         audio: audio,
         chart: chartData
     });
-}document.addEventListener('keydown', (e) => {
+}
+document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         if (currentScreen === 'menu') return;
         showScreen('menu');
@@ -153,6 +155,69 @@ function initializeGame(audio, chartData) {
             break;
     }
 });
+
+const audioCtx = new AudioContext();
+const analyser = audioCtx.createAnalyser();
+
+const creditsText = document.querySelectorAll('#credits span');
+const creditsDiv = document.getElementById('credits');
+const creditsButton = document.getElementById('credits-button');
+
+const audioElement = new Audio();
+audioElement.src = "https://ucarecdn.com/98f6e4a2-ab86-4895-a90a-a3179f37bc8d/InterstellarRetribution.mp3"; // Replace with your actual audio file
+audioElement.crossOrigin = "anonymous";
+
+const source = audioCtx.createMediaElementSource(audioElement);
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+
+function visualize() {
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(frequencyData);
+
+    const averageFrequency = frequencyData.reduce((sum, val) => sum + val, 0) / frequencyData.length;
+
+    const minFontSize = 20;       // Minimum font size
+    const maxFontSize = 40;       // Maximum font size
+    const scalingFactor = 0.2;
+    const minBlur = 5;        // Minimum blur radius
+    const maxBlur = 25;       // Maximum blur radius
+    const blurScalingFactor = 0.5; 
+    const minSpread = 0;  // This was missing or in the wrong scope
+    const maxSpread = 15;
+    const spreadScalingFactor = 0.3;// Adjust to control blur sensitivity;   // Adjust this to control scaling sensitivity
+
+    // Calculate the font size, clamping it between min and max
+    let fontSize = minFontSize + (averageFrequency * scalingFactor);
+    fontSize = Math.max(minFontSize, Math.min(fontSize, maxFontSize));
+    let spreadRadius = minSpread + (averageFrequency * spreadScalingFactor);
+    spreadRadius = Math.max(minSpread, Math.min(spreadRadius, maxSpread));
+    let blurRadius = minBlur + (averageFrequency * blurScalingFactor);
+    blurRadius = Math.max(minBlur, Math.min(blurRadius, maxBlur));
+
+
+    creditsText.forEach(span => {
+        span.style.fontSize = fontSize + 'px';
+        span.style.letterSpacing = (averageFrequency / 50) + 'em';
+        span.style.fontSize = fontSize + 'px'; // Use the calculated fontSize
+        span.style.letterSpacing = (averageFrequency / 50) + 'em';
+        span.style.textShadow = `0 0 ${blurRadius}px ${spreadRadius}px var(--primary)`; // You can adjust this too
+    });
+
+    requestAnimationFrame(visualize);
+}
+
+
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !creditsDiv.classList.contains('hidden')) {
+        creditsDiv.classList.add('hidden');
+        audioElement.pause();
+        audioElement.currentTime = 0;
+    }
+});
+
 function handleMenuNavigation(e) {
     switch(e.key) {
         case 'ArrowUp':
@@ -222,6 +287,9 @@ function selectMenuOption() {
         case 2:
             showScreen('settings');
             break;
+        case 3: // Credits  <-- Add this case
+            showScreen('credits'); //  <-- Call showScreen with 'credits'
+            break;
     }
 }
 
@@ -247,6 +315,13 @@ function showScreen(screenName) {
         if (!window.chartEditor) {
             window.chartEditor = new ChartEditor();
         }
+    }
+    else if (screenName === 'credits') {
+        // *** Resume the audio context before playing ***
+        audioCtx.resume().then(() => {  // Use .then() to ensure it's resumed
+            audioElement.play();
+            visualize();
+        });
     }
 }
 
