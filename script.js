@@ -530,6 +530,12 @@ class RhythmGame {
         document.getElementById('game-combo').textContent = `Combo: ${this.combo}`;
         document.getElementById('game-accuracy').textContent = `Accuracy: ${this.accuracy.toFixed(2)}%`;
         document.getElementById('game-misses').textContent = `Misses: ${this.notesMissed}`;
+
+        checkAchievements({
+            combo: this.combo,
+            accuracy: this.accuracy,
+            score: this.score
+        });
     }
 }
 
@@ -546,6 +552,7 @@ class ChartEditor {
         this.selectedNotes = new Set();
         this.startTime = 0;
         this.timelineOffset = 0;
+        this.seekAmount = 5;
         this.setupEditor();
     }
 
@@ -562,6 +569,25 @@ class ChartEditor {
         this.canvas.height = 400;
     }
 
+    seekTime(newTime) {
+        this.currentTime = Math.max(0, Math.min(newTime, this.audioBuffer.duration));
+        if (this.isPlaying) {
+            this.stopPlayback();
+            this.startPlayback();
+        }
+        this.draw();
+        this.updateTimeDisplay();
+    }
+    
+    rewind(seconds = this.seekAmount) {
+        this.seekTime(this.currentTime - seconds);
+    }
+    
+    fastForward(seconds = this.seekAmount) {
+        this.seekTime(this.currentTime + seconds);
+    }
+    
+
     setupEventListeners() {
         document.getElementById('audio-upload').addEventListener('change', (e) => this.loadAudio(e.target.files[0]));
         document.getElementById('play-pause').addEventListener('click', () => this.togglePlayback());
@@ -569,6 +595,9 @@ class ChartEditor {
         document.getElementById('snap').addEventListener('change', (e) => this.snap = parseInt(e.value));
         document.getElementById('save-chart').addEventListener('click', () => this.saveChart());
         document.getElementById('load-chart').addEventListener('change', (e) => this.loadChart(e.target.files[0]));
+        document.getElementById('seek-amount').addEventListener('change', (e) => {
+            this.seekAmount = parseInt(e.target.value);
+        });
         
         document.addEventListener('keydown', (e) => {
             const keyMap = { 'd': 0, 'f': 1, 'j': 2, 'k': 3 };
@@ -577,6 +606,12 @@ class ChartEditor {
             }
             if (e.key === 'Delete' || e.key === 'Backspace') {
                 this.deleteSelectedNotes();
+            }
+            if (e.key === 'ArrowLeft') {
+                this.rewind(e.shiftKey ? this.seekAmount * 2 : this.seekAmount);
+            }
+            if (e.key === 'ArrowRight') {
+                this.fastForward(e.shiftKey ? this.seekAmount * 2 : this.seekAmount);
             }
         });
 
