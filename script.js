@@ -218,6 +218,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 function handleMenuNavigation(e) {
+    if (currentScreen === 'editor') return;
     switch(e.key) {
         case 'ArrowUp':
             currentMenuIndex = (currentMenuIndex - 1 + menuButtons.length) % menuButtons.length;
@@ -570,11 +571,21 @@ class ChartEditor {
     }
 
     seekTime(newTime) {
+        // Cancel any existing animation frame first
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+        }
+        
         this.currentTime = Math.max(0, Math.min(newTime, this.audioBuffer.duration));
+        
+        // Only restart playback if we were playing
         if (this.isPlaying) {
-            this.stopPlayback();
+            if (this.audioSource) {
+                this.audioSource.stop();
+            }
             this.startPlayback();
         }
+        
         this.draw();
         this.updateTimeDisplay();
     }
