@@ -393,6 +393,13 @@ class RhythmGame {
         const keyMap = { 'd': 0, 'f': 1, 'j': 2, 'k': 3 };
         
         document.addEventListener('keydown', (e) => {
+            if (document.getElementById('game-container').classList.contains('hidden')) {
+                return;
+            }
+            
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+                return;
+            }
             const key = e.key.toLowerCase();
             if (keyMap.hasOwnProperty(key)) {
                 const lane = keyMap[key];
