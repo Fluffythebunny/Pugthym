@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FNF Chart Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            background: #333;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        button {
+            background: #6C63FF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5449ff;
+        }
+        .copy-success {
+            color: #4CAF50;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-success.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>FNF Chart Converter</h1>
+        <textarea id="input" placeholder="Paste FNF chart JSON here"></textarea>
+        <div class="button-container">
+            <button onclick="convertChart()">Convert</button>
+            <button onclick="copyOutput()">Copy Converted Chart</button>
+            <span id="copySuccess" class="copy-success">Copied!</span>
+        </div>
+        <textarea id="output" readonly></textarea>
+    </div>
+
+    <script>
+        function convertChart() {
+            const input = document.getElementById('input').value;
+            try {
+                const fnfChart = JSON.parse(input);
+                const notes = [];
+                
+                fnfChart.notes.forEach(section => {
+                    if (section.sectionNotes) {
+                        section.sectionNotes.forEach(note => {
+                            const time = note[0] / 1000;
+                            const lane = note[1] % 4;
+                            const duration = note[2];
+                            
+                            if (duration === 0) {
+                                notes.push({
+                                    time: time,
+                                    lane: lane
+                                });
+                            }
+                        });
+                    }
+                });
+
+                const convertedChart = {
+                    songTitle: fnfChart.song,
+                    bpm: fnfChart.bpm,
+                    notes: notes.sort((a, b) => a.time - b.time)
+                };
+
+                document.getElementById('output').value = JSON.stringify(convertedChart, null, 2);
+            } catch (error) {
+                document.getElementById('output').value = 'Error converting chart: ' + error.message;
+            }
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            
+            const copySuccess = document.getElementById('copySuccess');
+            copySuccess.classList.add('show');
+            setTimeout(() => {
+                copySuccess.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
