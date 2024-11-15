@@ -42,6 +42,8 @@
             <input type="file" id="load-chart" accept=".json">
             <span id="current-time">Time: 0:00</span>
             <span id="note-count">Notes: 0</span>
+            <input type="number" id="seek-amount" value="0.5" min="0.001" max="60" step="0.001">
+            <label for="seek-amount">Seek Amount (seconds)</label>
         </div>
         <canvas id="timeline"></canvas>
     </div>
@@ -81,5 +83,6 @@
 
     <div id="game-container" class="hidden"></div>
     <script src="script.js"></script>
+    <script src="achievements.js"></script>
 </body>
 </html>
