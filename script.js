@@ -596,7 +596,7 @@ class ChartEditor {
         document.getElementById('save-chart').addEventListener('click', () => this.saveChart());
         document.getElementById('load-chart').addEventListener('change', (e) => this.loadChart(e.target.files[0]));
         document.getElementById('seek-amount').addEventListener('change', (e) => {
-            this.seekAmount = parseInt(e.target.value);
+            this.seekAmount = parseFloat(e.target.value);
         });
         
         document.addEventListener('keydown', (e) => {
